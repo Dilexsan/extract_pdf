@@ -15,8 +15,8 @@ def read_pdf_file(file):
 
 def get_decided_on(text):
 
-    pattern1 = r"(?:Decided on|DECIDED ON)\s*[:]\s*\d{2}.\d{2}.\d{4}"
-    pattern2 = r"(?:Judgment On|JUDGEMENT ON)\s*[:]\s*\d{2}.\d{2}.\d{4}"
+    pattern1 = r"(?:Decided on|DECIDED ON |Decided On)\s*[:](\s*.*?\d{4})"
+    pattern2 = r"(?:Judgment On|JUDGMENT ON)\s*[:](\s*\d{2}.*?\d{4})"
     matches1 = re.findall(pattern1, text)
     matches1 = re.findall(pattern2, text)
 
@@ -51,7 +51,7 @@ def main(dir_path):
             continue
 
     # Write judge names to CSV
-    with open("decided.csv", "w", newline="") as csvfile:
+    with open("august.csv", "w", newline="") as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(["Judgment date"])
         for judgement_date in judgement_dates:
@@ -61,5 +61,5 @@ def main(dir_path):
 
 
 if __name__ == "__main__":
-    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\may"
+    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\july"
     main(dir_path)
