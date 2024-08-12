@@ -2,40 +2,32 @@ import os
 import re
 import glob
 import csv
+import pandas as pd
 from pdfminer.high_level import extract_text
-from casenumber import find_all_pdfs,read_first_page_text,get_case_numbers 
-from judge_practice import read_pdf_file,get_all_judge_names
+from casenumber import find_all_pdfs, read_first_page_text, get_case_numbers
+from judge_practice import read_pdf_file, get_all_judge_names
 from decided_on import get_decided_on
 
 def case_number_dataframe(dir_path):
     list_of_pdfs = find_all_pdfs(dir_path)
 
     # Extract case numbers
-    all_case_numbers = []
+    case_numbers = []
     for file in list_of_pdfs:
         try:
             text = read_first_page_text(file)
-            case_numbers = get_case_numbers(text)
-            if len(case_numbers) == 0:
-                case_numbers.append("0")  # Append "0" if no case numbers are found
-            elif len(case_numbers) > 1:
-                case_numbers[0]  # Append "/" if more than one case number is found
-            all_case_numbers.append(
-                case_numbers[0]
-            )  # Take only the first case number or the special value
+            case_nums = get_case_numbers(text)
+            if len(case_nums) == 0:
+                case_numbers.append("0")
+            elif len(case_nums) > 1:
+                case_numbers.append(case_nums[0])  # Take the first case number
+            else:
+                case_numbers.append(case_nums[0])
         except Exception as e:
             print(f"Error processing file {file}: {e}")
             continue
 
-    # Write case numbers to CSV
-    with open("casenumber.csv", "w", newline="") as csvfile:
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(["Case Number"])
-        for case_number in all_case_numbers:
-            csvwriter.writerow([case_number])
-
-    return 
-
+    return case_numbers
 
 def judge_name_dataframe(dir_path):
     list_of_pdfs = find_all_pdfs(dir_path)
@@ -50,53 +42,43 @@ def judge_name_dataframe(dir_path):
             print(f"Error processing file {file}: {e}")
             continue
 
-    # Write judge names to CSV
-    with open("judgepractice.csv", "w", newline="") as csvfile:
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(["Judge Name"])
-        for judge_name in judge_names:
-            csvwriter.writerow([judge_name])
-    
-    return 
-
+    return judge_names
 
 def judgment_date_dataframe(dir_path):
     list_of_pdfs = find_all_pdfs(dir_path)
 
-    # Extract judge names
-    judgement_dates = []
+    # Extract judgment dates
+    judgment_dates = []
     for file in list_of_pdfs:
         try:
             text = read_pdf_file(file)
-            judgement_dates.extend(get_decided_on(text))
+            judgment_dates.extend(get_decided_on(text))
         except Exception as e:
             print(f"Error processing file {file}: {e}")
             continue
 
-    # Write judge names to CSV
-    with open("decided.csv", "w", newline="") as csvfile:
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(["Judgment date"])
-        for judge_date in judgement_dates:
-            csvwriter.writerow([judge_date])
+    return judgment_dates
 
-    return 
+def create_dataframe(dir_path):
+    case_numbers = case_number_dataframe(dir_path)
+    judge_names = judge_name_dataframe(dir_path)
+    judgment_dates = judgment_date_dataframe(dir_path)
 
-def print_dataframe():
-    
-    return 
+    # Create a Pandas DataFrame
+    df = pd.DataFrame({
+        'Case Number': case_numbers,
+        'Judge Name': judge_names,
+        'Judgment Date': judgment_dates
+    })
 
-
+    return df
 
 def main(dir_path):
-
-    case_number_dataframe(dir_path)
-    judge_name_dataframe(dir_path)
-    judgment_date_dataframe(dir_path)
-    print_dataframe()
+    df = create_dataframe(dir_path)
+    df.to_csv("combined_data.csv", index=False)
 
     return
-    
+
 if __name__ == "__main__":
     dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\april"
     main(dir_path)
