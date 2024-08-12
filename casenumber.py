@@ -17,22 +17,11 @@ def read_first_page_text(file):
 
     # Clean up text
 
-    # first_page_text = re.sub(r"[^a-zA-Z0-9\/\s.]", " ", first_page_text)
-    # first_page_text = re.sub(r"\s+", " ", first_page_text)
     return first_page_text
 
 
 def get_case_numbers(text):
-    # tokens = word_tokenize(text)
-
-    # Remove stopwords and punctuation
-    # filtered_tokens = [
-    #     word
-    #     for word in tokens
-    #     if word.lower not in stop_words and word not in english_words
-    # ]
-
-    # Define pattern to detect case numbers
+    
     pattern1 = r"\b([A-Z]?.*?\d{2,4}/\d{2,4})\b"
     pattern2 = r"\b([A-Z].*?\d{2,4}-\d{2,4})\b"
     pattern3 = r"\b([A-Z]+/.*?/.*?/.*?/\d{2,4})\b"
@@ -49,15 +38,6 @@ def get_case_numbers(text):
         matches = re.findall(pattern3, text)
 
     return matches
-
-    # # Search for pattern matches in the filtered tokens
-    # matches = []
-    # for token in filtered_tokens:
-    #     if re.search(pattern, token, re.IGNORECASE):
-    #         matches.append(token)
-
-    # return matches
-
 
 def find_all_pdfs(dir_path):
     # Find all PDF files in the directory
@@ -95,5 +75,5 @@ def main(dir_path):
 
 
 if __name__ == "__main__":
-    dir_path = "D:/d/Intern_works/Automation/backend_automation/paralegal-backend-automation/ca_cases_new_website/ca_cases_2024/august"
+    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\april"
     main(dir_path)
