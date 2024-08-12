@@ -16,12 +16,20 @@ def read_pdf_file(file):
 def get_decided_on(text):
 
     pattern1 = r"(?:Decided on|DECIDED ON)\s*[:]\s*\d{2}.\d{2}.\d{4}"
+    pattern2 = r"(?:Judgment On|JUDGEMENT ON)\s*[:]\s*\d{2}.\d{2}.\d{4}"
     matches1 = re.findall(pattern1, text)
+    matches1 = re.findall(pattern2, text)
 
+
+    matches1 = re.findall(pattern1, text)
     if matches1:
         return matches1
-    else:
-        return ["0"]
+
+    matches2 = re.findall(pattern2, text)
+    if matches2:
+        return matches2
+
+    return ["0"]
 
 
 def find_all_pdfs(dir_path):
@@ -33,11 +41,11 @@ def main(dir_path):
     list_of_pdfs = find_all_pdfs(dir_path)
 
     # Extract judge names
-    judge_names = []
+    judgement_dates = []
     for file in list_of_pdfs:
         try:
             text = read_pdf_file(file)
-            judge_names.extend(get_decided_on(text))
+            judgement_dates.extend(get_decided_on(text))
         except Exception as e:
             print(f"Error processing file {file}: {e}")
             continue
@@ -45,13 +53,13 @@ def main(dir_path):
     # Write judge names to CSV
     with open("decided.csv", "w", newline="") as csvfile:
         csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(["Judge Name"])
-        for judge_name in judge_names:
-            csvwriter.writerow([judge_name])
+        csvwriter.writerow(["Judgment date"])
+        for judgement_date in judgement_dates:
+            csvwriter.writerow([judgement_date])
 
-    print(f"Extracted judge names have been written to judge1.csv")
+    print(f"Extracted judgment dates have been written to decided.csv")
 
 
 if __name__ == "__main__":
-    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\july"
+    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\may"
     main(dir_path)

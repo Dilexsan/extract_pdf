@@ -65,7 +65,7 @@ def main(dir_path):
         for judge_name in judge_names:
             csvwriter.writerow([judge_name])
 
-    print(f"Extracted judge names have been written to judge1.csv")
+    print(f"Extracted judge names have been written to judgepractice.csv")
 
 
 if __name__ == "__main__":
