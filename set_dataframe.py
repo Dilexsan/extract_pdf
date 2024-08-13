@@ -7,6 +7,7 @@ from pdfminer.high_level import extract_text
 from casenumber import find_all_pdfs, read_first_page_text, get_case_numbers
 from judge_practice import read_pdf_file, get_all_judge_names
 from decided_on import get_decided_on
+from argued_on import get_argued_on
 
 def case_number_dataframe(dir_path):
     list_of_pdfs = find_all_pdfs(dir_path)
@@ -59,16 +60,33 @@ def judgment_date_dataframe(dir_path):
 
     return judgment_dates
 
+def argue_date_dataframe(dir_path):
+    list_of_pdfs = find_all_pdfs(dir_path)
+
+    # Extract judgment dates
+    argue_dates = []
+    for file in list_of_pdfs:
+        try:
+            text = read_pdf_file(file)
+            argue_dates.extend(get_argued_on(text))
+        except Exception as e:
+            print(f"Error processing file {file}: {e}")
+            continue
+
+    return argue_dates
+
 def create_dataframe(dir_path):
     case_numbers = case_number_dataframe(dir_path)
     judge_names = judge_name_dataframe(dir_path)
     judgment_dates = judgment_date_dataframe(dir_path)
+    argued_dates = argue_date_dataframe(dir_path)
 
     # Create a Pandas DataFrame
     df = pd.DataFrame({
         'Case Number': case_numbers,
         'Judge Name': judge_names,
-        'Judgment Date': judgment_dates
+        'Judgment Date': judgment_dates,
+        'Argument Date' : argued_dates
     })
 
     return df
