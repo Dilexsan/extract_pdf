@@ -15,13 +15,16 @@ def read_pdf_file(file):
 
 def get_counsel(text):
 
-    text = text.lower()
-    pattern1 = r"(?:counsel)\s*[:]\s*.*?\s*:"
-    matches1 = re.findall(pattern1, text)
-    
+    #text = text.lower()
+    pattern1 = r"(?:counsel)\s*[:]\s*(.*?)\s*:"
+    pattern2 = r"(?:argued on|supported on|inquiry on)"
+
+    matches1 = re.findall(pattern1, text,re.IGNORECASE)
     if matches1:
-        return matches1
-       
+        cleaned_matches = []
+        cleaned_match = re.sub(pattern2, "", matches1[0],flags=re.IGNORECASE)
+        cleaned_matches.append(cleaned_match)
+        return cleaned_matches
     return ["0"]
 
 
@@ -46,13 +49,13 @@ def main(dir_path):
     # Write judge names to CSV
     with open("counsel.csv", "w", newline="") as csvfile:
         csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(["Judgment date"])
+        csvwriter.writerow(["Counsel Members"])
         for counsel in counsels:
             csvwriter.writerow([counsel])
 
-    print(f"Extracted judgment dates have been written to decided.csv")
+    print(f"Extracted counsel have been written to decided.csv")
 
 
 if __name__ == "__main__":
-    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\may"
+    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\june"
     main(dir_path)
