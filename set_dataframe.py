@@ -8,6 +8,7 @@ from casenumber import find_all_pdfs, read_first_page_text, get_case_numbers
 from judge_practice import read_pdf_file, get_all_judge_names
 from decided_on import get_decided_on
 from argued_on import get_argued_on
+from counsel import get_counsel
 
 def case_number_dataframe(dir_path):
     list_of_pdfs = find_all_pdfs(dir_path)
@@ -75,18 +76,35 @@ def argue_date_dataframe(dir_path):
 
     return argue_dates
 
+def counsel_dataframe(dir_path):
+    list_of_pdfs = find_all_pdfs(dir_path)
+
+    # Extract judgment dates
+    argue_dates = []
+    for file in list_of_pdfs:
+        try:
+            text = read_pdf_file(file)
+            argue_dates.extend(get_counsel(text))
+        except Exception as e:
+            print(f"Error processing file {file}: {e}")
+            continue
+
+    return argue_dates
+
 def create_dataframe(dir_path):
     case_numbers = case_number_dataframe(dir_path)
     judge_names = judge_name_dataframe(dir_path)
     judgment_dates = judgment_date_dataframe(dir_path)
     argued_dates = argue_date_dataframe(dir_path)
+    counsel_members = counsel_dataframe(dir_path)
 
     # Create a Pandas DataFrame
     df = pd.DataFrame({
         'Case Number': case_numbers,
         'Judge Name': judge_names,
         'Judgment Date': judgment_dates,
-        'Argument Date' : argued_dates
+        'Argument Date' : argued_dates,
+        'Counsel Members' : counsel_members
     })
 
     return df
@@ -98,5 +116,5 @@ def main(dir_path):
     return
 
 if __name__ == "__main__":
-    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\may"
+    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\april"
     main(dir_path)
