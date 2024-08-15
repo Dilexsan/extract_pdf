@@ -3,20 +3,27 @@ import re
 import glob
 import csv
 from pdfminer.high_level import extract_text
+import pdfplumber
 
+# def read_pdf_file(file):
+#     with open(file, "rb") as file_handle:
+#         text = extract_text(file_handle)
+#     text = re.sub(r"\s+", " ", text)
+    
+#     return text
 
 def read_pdf_file(file):
-    with open(file, "rb") as file_handle:
-        text = extract_text(file_handle)
-    text = re.sub(r"\s+", " ", text)
-    
+    with pdfplumber.open(file) as pdf:
+        text = ""
+        for page in pdf.pages:
+            text += page.extract_text()
+        text = re.sub(r"\s+", " ", text)
     return text
-
 
 def get_counsel(text):
 
     #text = text.lower()
-    pattern1 = r"(?:counsel)\s*[:]\s*(.*?)\s*:"
+    pattern1 = r"(?:counsel[s]?)\s*[:]\s*(.*?)\s*:"
     pattern2 = r"(?:argued on|supported on|inquiry on)"
 
     matches1 = re.findall(pattern1, text,re.IGNORECASE)
@@ -57,5 +64,5 @@ def main(dir_path):
 
 
 if __name__ == "__main__":
-    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\june"
+    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\august"
     main(dir_path)

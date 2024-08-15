@@ -3,14 +3,22 @@ import re
 import glob
 import csv
 from pdfminer.high_level import extract_text
+import pdfplumber
 
+# def read_pdf_file(file):
+#     with open(file, "rb") as file_handle:
+#         text = extract_text(file_handle)
+#     # text = re.sub(r"[^a-zA-Z0-9\/\s.]", " ", text)
+#     text = re.sub(r"\s+", " ", text)
+
+#     return text
 
 def read_pdf_file(file):
-    with open(file, "rb") as file_handle:
-        text = extract_text(file_handle)
-    # text = re.sub(r"[^a-zA-Z0-9\/\s.]", " ", text)
-    text = re.sub(r"\s+", " ", text)
-
+    with pdfplumber.open(file) as pdf:
+        text = ""
+        for page in pdf.pages:
+            text += page.extract_text()
+        text = re.sub(r"\s+", " ", text)
     return text
 
 
@@ -59,7 +67,7 @@ def main(dir_path):
             continue
 
     # Write judge names to CSV
-    with open("judgepractice.csv", "w", newline="") as csvfile:
+    with open("plumber.csv", "w", newline="") as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(["Judge Name"])
         for judge_name in judge_names:
@@ -69,5 +77,5 @@ def main(dir_path):
 
 
 if __name__ == "__main__":
-    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\april"
+    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\august"
     main(dir_path)

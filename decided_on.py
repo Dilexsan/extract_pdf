@@ -3,13 +3,21 @@ import re
 import glob
 import csv
 from pdfminer.high_level import extract_text
+import pdfplumber
 
+# def read_pdf_file(file):
+#     with open(file, "rb") as file_handle:
+#         text = extract_text(file_handle)
+#     text = re.sub(r"\s+", " ", text)
+    
+#     return text
 
 def read_pdf_file(file):
-    with open(file, "rb") as file_handle:
-        text = extract_text(file_handle)
-    text = re.sub(r"\s+", " ", text)
-    
+    with pdfplumber.open(file) as pdf:
+        text = ""
+        for page in pdf.pages:
+            text += page.extract_text()
+        text = re.sub(r"\s+", " ", text)
     return text
 
 

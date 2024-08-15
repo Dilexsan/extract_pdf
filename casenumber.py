@@ -5,20 +5,27 @@ import csv
 import fitz  # PyMuPDF
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords, words
+import pdfplumber
 
+
+# def read_first_page_text(file):
+#     # Open the PDF file
+#     doc = fitz.open(file)
+
+#     # Extract text from the first page
+#     first_page_text = doc[0].get_text()
+#     doc.close()
+
+#     # Clean up text
+
+#     return first_page_text
 
 def read_first_page_text(file):
-    # Open the PDF file
-    doc = fitz.open(file)
+    with pdfplumber.open(file) as pdf:
+        text = ""
+        text = pdf.pages[0].extract_text()
 
-    # Extract text from the first page
-    first_page_text = doc[0].get_text()
-    doc.close()
-
-    # Clean up text
-
-    return first_page_text
-
+    return text
 
 def get_case_numbers(text):
     
@@ -65,7 +72,7 @@ def main(dir_path):
             continue
 
     # Write case numbers to CSV
-    with open("casenumber.csv", "w", newline="") as csvfile:
+    with open("caseplumber.csv", "w", newline="") as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(["Case Number"])
         for case_number in all_case_numbers:
@@ -75,5 +82,5 @@ def main(dir_path):
 
 
 if __name__ == "__main__":
-    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\april"
+    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\august"
     main(dir_path)
