@@ -27,9 +27,9 @@ def get_all_judge_names(text):
     # words = word_tokenize(text)
     # filtered_words = [word for word in words if word in stop_words]
     # text = " ".join(filtered_words)
-    pattern1 = r"(?:Before|BEFORE)\s*[:]\s*.*?(?:Counsel[s]?|COUNSEL[S]?)\s*[:]\s*"
+    pattern1 = r"(?:Before|BEFORE)\s*[:]\s*(.*?)(?:Counsel[s]?|COUNSEL[S]?)\s*[:]\s*"
     pattern2 = r"([A-Z]\s*[.]?\s*.*?\s*[,]?\s*J.?)"
-    # pattern3 = r"([A-Z].*?J|J.)"
+    pattern3 = r"([A-Z].*?,j.?)"
     # Use regular expression to find the text between "before" and "counsel"
     matches1 = re.findall(pattern1, text)
     # matches = " ".join(matches)
@@ -38,8 +38,11 @@ def get_all_judge_names(text):
         return ["0"]
     judge_name = []
     for i in matches1:
-        cleaned_match = re.sub(r"Before|:|BEFORE|&", "", i)
+        cleaned_match = re.sub(r"&|:", "", i)
+        cleaned_match = re.sub(r"p/ca|\(ca\)", "", cleaned_match,flags=re.IGNORECASE)
         cleaned_match = " ".join(word.capitalize() for word in cleaned_match.split())
+        cleaned_match = re.sub(r",j.?",",J.",cleaned_match)
+    
         name = re.findall(pattern2, cleaned_match)
         if name:
             judge_name.append(name)
@@ -77,5 +80,5 @@ def main(dir_path):
 
 
 if __name__ == "__main__":
-    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\august"
+    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\may"
     main(dir_path)
