@@ -11,7 +11,7 @@ import pdfplumber
 #     text = re.sub(r"\s+", " ", text)
     
 #     return text
-
+    
 def read_pdf_file(file):
     with pdfplumber.open(file) as pdf:
         text = ""
