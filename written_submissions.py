@@ -16,29 +16,36 @@ def read_pdf_file(file):
     with pdfplumber.open(file) as pdf:
         text = ""
         for page in pdf.pages:
-            text += page.extract_text()
+            cropped_page = page.crop((0, 80, page.width, page.height - 80))
+            text += cropped_page.extract_text()
         text = re.sub(r"\s+", " ", text)
     return text
 
+# def get_counsel(text):
 
-def get_decided_on(text):
-    text = text.lower()
+#     #text = text.lower()
+#     pattern1 = r"(?:counsel[s]?)\s*[:]\s*(.*?)\s*:"
+#     pattern2 = r"(?:argued on|supported on|inquiry on)"
 
-    pattern1 = r"(?:written submissions|written submissions on)\s*[:]\s*(\d{1,4}[-/.]\d{1,2}[-/.]\d{1,4})"
-    pattern2 = r"(?:written submissions|written submissions on)\s*[:]\s*(\d{1,2}.*?\d{4})"
-    matches1 = re.findall(pattern1, text)
-    matches2 = re.findall(pattern2, text)
+#     matches1 = re.findall(pattern1, text,re.IGNORECASE)
+#     if matches1:
+#         cleaned_matches = []
+#         cleaned_match = re.sub(pattern2, "", matches1[0],flags=re.IGNORECASE)
+#         cleaned_matches.append(cleaned_match)
+#         return cleaned_matches
+#     return ["0"]
 
-    dates = []
+def get_counsel(text):
+
+    #text = text.lower()
+    pattern = r"Written Submissions?.*?\s*:\s*(.*?)(?=\b(?:Argued on|Decided on|Supported on|Inquiry on)\s*:\s*\b)"
+
+    matches1 = re.findall(pattern, text,re.IGNORECASE)
     if matches1:
-        dates.append(matches1[0])
-        
-    elif matches2:  
-        dates.append(matches2[0])
-    else:
-        dates.append("0")
-       
-    return dates
+        cleaned_matches = []
+        cleaned_matches.append(matches1[0])
+        return cleaned_matches
+    return ["0"]
 
 
 def find_all_pdfs(dir_path):
@@ -50,11 +57,11 @@ def main(dir_path):
     list_of_pdfs = find_all_pdfs(dir_path)
 
     # Extract judge names
-    judgement_dates = []
+    counsels = []
     for file in list_of_pdfs:
         try:
             text = read_pdf_file(file)
-            judgement_dates.extend(get_decided_on(text))
+            counsels.extend(get_counsel(text))
         except Exception as e:
             print(f"Error processing file {file}: {e}")
             continue
@@ -62,13 +69,13 @@ def main(dir_path):
     # Write judge names to CSV
     with open("written.csv", "w", newline="") as csvfile:
         csvwriter = csv.writer(csvfile)
-        csvwriter.writerow(["Judgment date"])
-        for judgement_date in judgement_dates:
-            csvwriter.writerow([judgement_date])
+        csvwriter.writerow(["Counsel Members"])
+        for counsel in counsels:
+            csvwriter.writerow([counsel])
 
-    print(f"Extracted judgment dates have been written to decided.csv")
+    print(f"Extracted counsel have been written to decided.csv")
 
 
 if __name__ == "__main__":
-    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\may"
+    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\june"
     main(dir_path)

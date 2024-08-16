@@ -16,21 +16,35 @@ def read_pdf_file(file):
     with pdfplumber.open(file) as pdf:
         text = ""
         for page in pdf.pages:
-            text += page.extract_text()
+            cropped_page = page.crop((0, 80, page.width, page.height - 90))
+            text += cropped_page.extract_text()
         text = re.sub(r"\s+", " ", text)
     return text
+
+# def get_counsel(text):
+
+#     #text = text.lower()
+#     pattern1 = r"(?:counsel[s]?)\s*[:]\s*(.*?)\s*:"
+#     pattern2 = r"(?:argued on|supported on|inquiry on)"
+
+#     matches1 = re.findall(pattern1, text,re.IGNORECASE)
+#     if matches1:
+#         cleaned_matches = []
+#         cleaned_match = re.sub(pattern2, "", matches1[0],flags=re.IGNORECASE)
+#         cleaned_matches.append(cleaned_match)
+#         return cleaned_matches
+#     return ["0"]
 
 def get_counsel(text):
 
     #text = text.lower()
-    pattern1 = r"(?:counsel[s]?)\s*[:]\s*(.*?)\s*:"
-    pattern2 = r"(?:argued on|supported on|inquiry on)"
+    pattern = r"Counsel[s]?\s*:(.*?)(?=\b(?:Argued on|Written Submissions|Decided on|Supported on|Inquiry on)\s*:\s*\b)"
 
-    matches1 = re.findall(pattern1, text,re.IGNORECASE)
+    matches1 = re.findall(pattern, text,re.IGNORECASE)
     if matches1:
         cleaned_matches = []
-        cleaned_match = re.sub(pattern2, "", matches1[0],flags=re.IGNORECASE)
-        cleaned_matches.append(cleaned_match)
+        texts = matches1[0].replace("�", "")
+        cleaned_matches.append(texts)
         return cleaned_matches
     return ["0"]
 
@@ -64,5 +78,5 @@ def main(dir_path):
 
 
 if __name__ == "__main__":
-    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\august"
+    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\may"
     main(dir_path)
