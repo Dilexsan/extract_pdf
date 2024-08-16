@@ -12,7 +12,7 @@ import pdfplumber
     
 #     return text
 
-def read_pdf_file(file):
+def read_pdf_file_counsel(file):
     with pdfplumber.open(file) as pdf:
         text = ""
         for page in pdf.pages:
@@ -61,7 +61,7 @@ def main(dir_path):
     counsels = []
     for file in list_of_pdfs:
         try:
-            text = read_pdf_file(file)
+            text = read_pdf_file_counsel(file)
             counsels.extend(get_counsel(text))
         except Exception as e:
             print(f"Error processing file {file}: {e}")

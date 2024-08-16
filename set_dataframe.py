@@ -8,7 +8,8 @@ from casenumber import find_all_pdfs, read_first_page_text, get_case_numbers
 from judge_practice import read_pdf_file, get_all_judge_names
 from decided_on import get_decided_on
 from argued_on import get_argued_on
-from counsel import get_counsel
+from counsel import get_counsel,read_pdf_file_counsel
+from written_submissions import get_written,read_pdf_file_written
 
 def case_number_dataframe(dir_path):
     list_of_pdfs = find_all_pdfs(dir_path)
@@ -83,8 +84,23 @@ def counsel_dataframe(dir_path):
     argue_dates = []
     for file in list_of_pdfs:
         try:
-            text = read_pdf_file(file)
+            text = read_pdf_file_counsel(file)
             argue_dates.extend(get_counsel(text))
+        except Exception as e:
+            print(f"Error processing file {file}: {e}")
+            continue
+
+    return argue_dates
+
+def written_dataframe(dir_path):
+    list_of_pdfs = find_all_pdfs(dir_path)
+
+    # Extract judgment dates
+    argue_dates = []
+    for file in list_of_pdfs:
+        try:
+            text = read_pdf_file_written(file)
+            argue_dates.extend(get_written(text))
         except Exception as e:
             print(f"Error processing file {file}: {e}")
             continue
@@ -97,6 +113,7 @@ def create_dataframe(dir_path):
     judgment_dates = judgment_date_dataframe(dir_path)
     argued_dates = argue_date_dataframe(dir_path)
     counsel_members = counsel_dataframe(dir_path)
+    written_submissions_details = written_dataframe(dir_path)
 
     # Create a Pandas DataFrame
     df = pd.DataFrame({
@@ -104,7 +121,8 @@ def create_dataframe(dir_path):
         'Judge Name': judge_names,
         'Judgment Date': judgment_dates,
         'Argument Date' : argued_dates,
-        'Counsel Members' : counsel_members
+        'Counsel Members' : counsel_members,
+        'Written Submissions' : written_submissions_details
     })
 
     return df
@@ -116,5 +134,5 @@ def main(dir_path):
     return
 
 if __name__ == "__main__":
-    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\july"
+    dir_path = "D:\d\Intern_works\Automation\extract_pdf\ca_cases_new_website\ca_cases_2024\\april"
     main(dir_path)

@@ -12,7 +12,7 @@ import pdfplumber
     
 #     return text
     
-def read_pdf_file(file):
+def read_pdf_file_written(file):
     with pdfplumber.open(file) as pdf:
         text = ""
         for page in pdf.pages:
@@ -35,7 +35,7 @@ def read_pdf_file(file):
 #         return cleaned_matches
 #     return ["0"]
 
-def get_counsel(text):
+def get_written(text):
 
     #text = text.lower()
     pattern = r"Written Submissions?.*?\s*:\s*(.*?)(?=\b(?:Argued on|Decided on|Supported on|Inquiry on)\s*:\s*\b)"
@@ -60,8 +60,8 @@ def main(dir_path):
     counsels = []
     for file in list_of_pdfs:
         try:
-            text = read_pdf_file(file)
-            counsels.extend(get_counsel(text))
+            text = read_pdf_file_written(file)
+            counsels.extend(get_written(text))
         except Exception as e:
             print(f"Error processing file {file}: {e}")
             continue
